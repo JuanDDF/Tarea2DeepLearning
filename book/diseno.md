@@ -60,8 +60,12 @@ Fijamos un límite estricto de 18 horas de entrenamiento y ordenamos el trabajo 
 | F1 | Búsqueda completa en la configuración representativa (lag 14, H 14) |
 | F2 | Ganadora de F1 evaluada en las 16 configuraciones con las 3 estrategias |
 | F3 | Modelos finales y hold-out con la ganadora de F1 |
-| F4 | Búsqueda completa en las otras 15 configuraciones |
+| F4 | Búsqueda en las otras 15 configuraciones, intercalada entre configuraciones |
 | F5 | Ganadora propia de cada configuración: modelo final, Top-5 en hold-out, re-evaluación |
 | F6 | Entrenamiento fold a fold con las 3 estrategias: predicciones, métricas, BDS y referencias |
 
-El programa guarda cada resultado en Google Drive con escritura atómica y, si la sesión se interrumpe, se reanuda saltando lo ya hecho. Tiene tres topes medidos desde el arranque: F4 no inicia candidatos después de 16 h 45 min; ninguna fase inicia tareas nuevas después de 17 h 45 min; y a las 18 h el proceso se detiene. El orden de evaluación de los candidatos dentro de cada configuración es aleatorio con semilla fija, para que un corte deje una muestra no sesgada del espacio. Cada entrenamiento usa una semilla derivada de su identificador, lo que hace reproducible la corrida.
+El programa guarda cada resultado en Google Drive con escritura atómica y, si la sesión se interrumpe, se reanuda saltando lo ya hecho. Tiene tres topes medidos desde el arranque: F4 no inicia candidatos después de 16 h 45 min; ninguna fase inicia tareas nuevas después de 17 h 45 min; y a las 18 h el proceso se detiene. El orden de evaluación de los candidatos dentro de cada configuración es aleatorio con semilla fija, y F4 avanza de forma intercalada entre las 15 configuraciones, para que un corte deje en todas una muestra no sesgada y de tamaño similar. Cada entrenamiento usa una semilla derivada de su identificador, lo que hace reproducible la corrida.
+
+## Ejecución real
+
+El entrenamiento corrió 17 h 12 min entre el 14 y el 15 de noviembre de 2026 y terminó todas las fases sin errores ni entrenamientos truncados. La sesión se reanudó tres veces (dos por ajustes del programa y una para cambiar el orden de F4 a intercalado); una verificación de integridad posterior encontró 0 registros dañados, 0 duplicados y 0 resultados sin valor. El ritmo sostenido fue de 6.4 a 8.8 tareas por minuto (una tarea = un candidato con sus 5 folds), menor que el estimado con las mediciones previas. En consecuencia, F4 alcanzó el tope de 16 h 45 min con 441 o 442 de las 584 candidatas evaluadas en cada una de las 15 configuraciones (75.6 %). La configuración (14, 14) se evaluó completa. F5 y F6 terminaron en 18 minutos, una hora antes del corte.

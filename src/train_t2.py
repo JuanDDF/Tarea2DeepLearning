@@ -399,6 +399,12 @@ class Writer:
         self.t = time.time()
 
 
+def intercalar(listas):
+    """Round-robin entre configuraciones: si el tope corta F4, cada configuración queda con una
+    muestra aleatoria de tamaño similar, en vez de configuraciones completas y otras sin evaluar."""
+    return [t for grupo in itertools.zip_longest(*listas) for t in grupo if t is not None]
+
+
 def run_phase(name, tasks, deadline):
     recs = load_records()
     todo = [dict(t, deadline=deadline) for t in tasks if t["id"] not in recs]
@@ -482,7 +488,8 @@ def main():
     run_phase("F3 modelos finales con ganadora F1",
               [final_task("final_rep", L, H, wa, wm, save="rep") for L, H in ALL_CONFIGS], stop_new)
     run_phase("F4 búsqueda en las otras configuraciones",
-              [cv_task("search", L, H, "gk", a, m) for L, H in F4_ORDER for a, m in shuffled(L, H)], stop_search)
+              intercalar([[cv_task("search", L, H, "gk", a, m) for a, m in shuffled(L, H)] for L, H in F4_ORDER]),
+              stop_search)
 
     recs = load_records(); write_summary(recs)
     p1, p2, p3 = [], [], []

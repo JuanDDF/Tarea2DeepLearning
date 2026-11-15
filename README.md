@@ -3,7 +3,9 @@
 Proyecto Integrador de Deep Learning (sección 2.21) · Universidad del Norte · Noviembre de 2026
 Autores: Anyely Sanjuan Benavides y Juan David Díaz Fernández · Profesor: Dr. Lihki Rubio
 
-Pronosticamos el precio de cierre diario de BTCUSDT (Binance, 2018–2025) a 7, 14, 21 y 28 días con un MLP multisalida en Keras. Para cada combinación de lag (7, 14, 21, 28) y horizonte buscamos la mejor arquitectura entre 584 candidatas, validamos con las tres estrategias de `timeseries-cv` (Group K-Fold, Forward Chaining y K-Fold), diagnosticamos los residuos con el test BDS y evaluamos en un hold-out temporal de 292 días. El mejor modelo por horizonte se sirve con una API en FastAPI.
+Pronosticamos el precio de cierre diario de BTCUSDT (Binance, 2018–2025) a 7, 14, 21 y 28 días con un MLP multisalida en Keras. Para cada combinación de lag (7, 14, 21, 28) y horizonte buscamos la mejor arquitectura en un espacio de 584 candidatas (completo en lag 14 / H 14 y una muestra aleatoria del 75.6 % en las demás configuraciones por el límite de 18 h de cómputo), validamos con las tres estrategias de `timeseries-cv` (Group K-Fold, Forward Chaining y K-Fold), diagnosticamos los residuos con el test BDS y evaluamos en un hold-out temporal de 292 días. El mejor modelo por horizonte se sirve con una API en FastAPI.
+
+**Resultado principal:** el MLP no supera al pronóstico ingenuo (último precio repetido) en ninguna configuración, ni en validación (48 de 48) ni en el hold-out (16 de 16); sí supera a `MLPRegressor` en las 16 configuraciones. El mejor modelo en el hold-out (lag 14, H 7) obtiene un MAPE de 3.96 %, frente a 2.81 % del ingenuo. Los detalles están en el informe.
 
 **Informe (Jupyter Book):** https://juanddf.github.io/Tarea2DeepLearning/
 

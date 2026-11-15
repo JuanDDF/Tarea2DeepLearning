@@ -1,0 +1,46 @@
+{
+ "7": {
+  "lag": 7,
+  "origen": "own",
+  "val_rmse_usd_gk": 2728.672454126468,
+  "arch": [
+   64
+  ],
+  "mask": [
+   false
+  ]
+ },
+ "14": {
+  "lag": 7,
+  "origen": "own",
+  "val_rmse_usd_gk": 3482.698449590287,
+  "arch": [
+   64
+  ],
+  "mask": [
+   false
+  ]
+ },
+ "21": {
+  "lag": 7,
+  "origen": "own",
+  "val_rmse_usd_gk": 4202.187005124745,
+  "arch": [
+   32
+  ],
+  "mask": [
+   false
+  ]
+ },
+ "28": {
+  "lag": 7,
+  "origen": "own",
+  "val_rmse_usd_gk": 4706.152217615623,
+  "arch": [
+   256
+  ],
+  "mask": [
+   false
+  ]
+ }
+}

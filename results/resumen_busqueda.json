@@ -1,0 +1,282 @@
+{
+ "L14_H14": {
+  "evaluados": 584,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    256
+   ],
+   "mask": [
+    false,
+    false
+   ],
+   "best_val_rmse": 0.12092174142599106,
+   "gap_ratio": 0.0323357318821365
+  }
+ },
+ "L7_H7": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    64
+   ],
+   "mask": [
+    false
+   ],
+   "best_val_rmse": 0.09972381442785264,
+   "gap_ratio": 0.011129331080154263
+  }
+ },
+ "L28_H28": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    256,
+    256
+   ],
+   "mask": [
+    false,
+    false
+   ],
+   "best_val_rmse": 0.1777254521846771,
+   "gap_ratio": 0.024912196352040814
+  }
+ },
+ "L21_H21": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    128,
+    64
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.16667139232158662,
+   "gap_ratio": 0.113194486700456
+  }
+ },
+ "L7_H14": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    64
+   ],
+   "mask": [
+    false
+   ],
+   "best_val_rmse": 0.1241875171661377,
+   "gap_ratio": 0.02160913152390893
+  }
+ },
+ "L14_H7": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    64,
+    128
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.09928034394979476,
+   "gap_ratio": 0.09480697382134116
+  }
+ },
+ "L28_H14": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    128,
+    128,
+    256
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.1447302982211113,
+   "gap_ratio": 0.012246200610687924
+  }
+ },
+ "L14_H28": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    64,
+    128
+   ],
+   "mask": [
+    false,
+    false
+   ],
+   "best_val_rmse": 0.16694557368755342,
+   "gap_ratio": 0.002413400536213378
+  }
+ },
+ "L7_H21": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32
+   ],
+   "mask": [
+    false
+   ],
+   "best_val_rmse": 0.14548424780368804,
+   "gap_ratio": 0.03088494027613217
+  }
+ },
+ "L21_H7": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    64,
+    128,
+    128
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.11667869985103607,
+   "gap_ratio": 0.10555239186863642
+  }
+ },
+ "L28_H21": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    128,
+    64,
+    128
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.16357343792915344,
+   "gap_ratio": 0.0024025009739253966
+  }
+ },
+ "L21_H28": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    128,
+    256
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.18488451540470124,
+   "gap_ratio": 0.09191373998743889
+  }
+ },
+ "L7_H28": {
+  "evaluados": 442,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    256
+   ],
+   "mask": [
+    false
+   ],
+   "best_val_rmse": 0.16613125205039977,
+   "gap_ratio": 0.12363222578885871
+  }
+ },
+ "L28_H7": {
+  "evaluados": 441,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    128,
+    256
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.10775225013494491,
+   "gap_ratio": 0.020990685675716686
+  }
+ },
+ "L14_H21": {
+  "evaluados": 441,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    32,
+    128
+   ],
+   "mask": [
+    false,
+    false,
+    false
+   ],
+   "best_val_rmse": 0.1477164775133133,
+   "gap_ratio": 0.023837826468753206
+  }
+ },
+ "L21_H14": {
+  "evaluados": 441,
+  "total": 584,
+  "hay_balanceados": true,
+  "ganadora": {
+   "arch": [
+    32,
+    256
+   ],
+   "mask": [
+    false,
+    false
+   ],
+   "best_val_rmse": 0.13460114002227783,
+   "gap_ratio": 0.11379240683996916
+  }
+ }
+}

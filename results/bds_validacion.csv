@@ -1,0 +1,49 @@
+estrategia,lag,H,folds_con_bds,bds_p_medio,folds_p_mayor_005
+Forward Chaining,7,7,0,,0
+Forward Chaining,7,14,0,,0
+Forward Chaining,7,21,0,,0
+Forward Chaining,7,28,0,,0
+Forward Chaining,14,7,0,,0
+Forward Chaining,14,14,0,,0
+Forward Chaining,14,21,0,,0
+Forward Chaining,14,28,0,,0
+Forward Chaining,21,7,0,,0
+Forward Chaining,21,14,0,,0
+Forward Chaining,21,21,0,,0
+Forward Chaining,21,28,0,,0
+Forward Chaining,28,7,0,,0
+Forward Chaining,28,14,0,,0
+Forward Chaining,28,21,0,,0
+Forward Chaining,28,28,0,,0
+Group K-Fold,7,7,5,0.07471689145468867,2
+Group K-Fold,7,14,5,0.11886003305747865,1
+Group K-Fold,7,21,5,0.029711124724444003,1
+Group K-Fold,7,28,5,0.09059595555140058,1
+Group K-Fold,14,7,5,0.0526704831467766,1
+Group K-Fold,14,14,5,8.250606192172498e-05,0
+Group K-Fold,14,21,5,0.0002556527243618962,0
+Group K-Fold,14,28,5,0.11642108584659672,1
+Group K-Fold,21,7,5,0.11267264724876999,2
+Group K-Fold,21,14,5,0.03154176747116899,1
+Group K-Fold,21,21,5,0.06373727787052148,3
+Group K-Fold,21,28,5,0.09576947963324751,2
+Group K-Fold,28,7,5,0.12656982472341588,2
+Group K-Fold,28,14,5,0.241160361583655,4
+Group K-Fold,28,21,5,0.21387458158831416,2
+Group K-Fold,28,28,5,0.3140238561749199,4
+K-Fold,7,7,0,,0
+K-Fold,7,14,0,,0
+K-Fold,7,21,0,,0
+K-Fold,7,28,0,,0
+K-Fold,14,7,0,,0
+K-Fold,14,14,0,,0
+K-Fold,14,21,0,,0
+K-Fold,14,28,0,,0
+K-Fold,21,7,0,,0
+K-Fold,21,14,0,,0
+K-Fold,21,21,0,,0
+K-Fold,21,28,0,,0
+K-Fold,28,7,0,,0
+K-Fold,28,14,0,,0
+K-Fold,28,21,0,,0
+K-Fold,28,28,0,,0

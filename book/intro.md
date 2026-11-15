@@ -15,7 +15,7 @@ Precio de cierre diario de BTCUSDT en Binance (2018–2025). La franja gris es e
 
 Pronosticamos el precio de cierre diario del par BTCUSDT a 7, 14, 21 y 28 días con un perceptrón multicapa (MLP) multisalida, que entrega en una sola pasada los H valores del horizonte. Combinamos cuatro tamaños de ventana de entrada (lags de 7, 14, 21 y 28 días) con los cuatro horizontes, para un total de 16 configuraciones.
 
-Para cada configuración buscamos la mejor arquitectura entre 584 candidatas (de una a tres capas ocultas, con 32, 64, 128 o 256 neuronas y Dropout(0.5) activable por capa). Seleccionamos con un criterio que combina el error de validación y el control del sobreajuste. Validamos con las tres estrategias de partición temporal de la librería `timeseries-cv` (Group K-Fold, Forward Chaining y K-Fold) y reportamos MAPE, MAE, RMSE y MSE por paso de horizonte. Diagnosticamos los residuos con el test BDS y evaluamos el modelo final en un hold-out temporal de 292 días.
+Para cada configuración buscamos la mejor arquitectura en un espacio de 584 candidatas (de una a tres capas ocultas, con 32, 64, 128 o 256 neuronas y Dropout(0.5) activable por capa). Seleccionamos con un criterio que combina el error de validación y el control del sobreajuste. Validamos con las tres estrategias de partición temporal de la librería `timeseries-cv` (Group K-Fold, Forward Chaining y K-Fold) y reportamos MAPE, MAE, RMSE y MSE por paso de horizonte. Diagnosticamos los residuos con el test BDS y evaluamos el modelo final en un hold-out temporal de 292 días.
 
 El mejor modelo de cada horizonte se sirve mediante una API (FastAPI) empaquetada en Docker, con pruebas unitarias e integración continua en GitHub Actions.
 
