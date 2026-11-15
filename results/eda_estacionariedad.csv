@@ -1,0 +1,4 @@
+serie,ADF_pvalor,KPSS_pvalor
+precio,0.8279,0.01
+log(precio),0.8853,0.01
+retorno log,0.0,0.1
