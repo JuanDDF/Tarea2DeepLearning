@@ -1,0 +1,2619 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Entrenamiento fold a fold y evaluación &#8212; Pronóstico del precio de Bitcoin con MLP multisalida</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../_static/autores.css?v=d9f43ba9" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=78d55cf8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Haz clic para mostrar';</script>
+    <script>let toggleHintHide = 'Haz clic para ocultar';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script src="../_static/translations.js?v=d190bf04"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../_static/design-tabs.js?v=fcb327ea"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/3_model_training';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="4. Diagnóstico de residuos" href="4_residual_analysis.html" />
+    <link rel="prev" title="2. Búsqueda de la mejor arquitectura MLP" href="2_architecture_search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Búsqueda</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Búsqueda</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../book/intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Pronóstico del precio de Bitcoin con MLP multisalida</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><div class="autores">
+  <div class="autor">
+    <img src="../_static/autores/anyely.jpg" alt="Anyely Sanjuan Benavides">
+    <p class="autor-nombre">Anyely Sanjuan Benavides</p>
+    <p class="autor-detalle">Msc. Analítica de Datos<br>Universidad del Norte</p>
+  </div>
+  <div class="autor">
+    <img src="../_static/autores/juan.jpg" alt="Juan David Díaz Fernández">
+    <p class="autor-nombre">Juan David Díaz Fernández</p>
+    <p class="autor-detalle">Msc. Ingeniería Mecánica<br>Universidad del Norte</p>
+  </div>
+</div></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Búsqueda</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../book/intro.html">
+                    Pronóstico del precio de Bitcoin con MLP multisalida
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../book/diseno.html">Diseño experimental</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1_eda.html">1. Análisis exploratorio de la serie BTCUSDT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2_architecture_search.html">2. Búsqueda de la mejor arquitectura MLP</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Entrenamiento fold a fold y evaluación</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4_residual_analysis.html">4. Diagnóstico de residuos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../book/conclusiones.html">Conclusiones</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/JuanDDF/Tarea2DeepLearning" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Repositorio de origen"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Descarga esta pagina">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/3_model_training.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Descargar archivo fuente"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimir en PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Modo de pantalla completa"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Tema" data-bs-title="Tema"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Claro"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Oscuro"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="Sistema"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>3. Entrenamiento fold a fold y evaluación</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenido </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-por-fold-validacion-usd">3.1 Métricas por fold (validación, USD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-por-paso-de-horizonte">3.2 Métricas por paso de horizonte</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-consolidada-lag-horizonte">3.3 Tabla consolidada lag × horizonte</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-de-estrategias-de-validacion">3.4 Comparación de estrategias de validación</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#esquema-de-particion-de-cada-estrategia">Esquema de partición de cada estrategia</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#referencias-mlpregressor-y-pronostico-ingenuo">3.5 Referencias: MLPRegressor y pronóstico ingenuo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-final-en-el-hold-out">3.6 Modelo final en el hold-out</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#series-reales-y-predichas-train-validacion-y-hold-out">3.7 Series reales y predichas (train, validación y hold-out)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis">3.8 Síntesis</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="entrenamiento-fold-a-fold-y-evaluacion">
+<h1>3. Entrenamiento fold a fold y evaluación<a class="headerlink" href="#entrenamiento-fold-a-fold-y-evaluacion" title="Link to this heading">#</a></h1>
+<p>Con la arquitectura seleccionada para cada (lag, H) entrenamos el MLP multisalida fold a fold con las tres estrategias de <code class="docutils literal notranslate"><span class="pre">timeseries-cv</span></code> (Group K-Fold, Forward Chaining y K-Fold) y calculamos, en USD y sobre validación, MAPE, MAE, RMSE y MSE por paso de horizonte y agregados, junto con el p-valor BDS de los residuos de h = 1. Comparamos con dos referencias: <code class="docutils literal notranslate"><span class="pre">MLPRegressor</span></code> de scikit-learn y el pronóstico ingenuo (último precio observado repetido H días). El modelo final de cada configuración, reentrenado con toda la serie previa al hold-out, se evalúa aparte en el hold-out.</p>
+<p>Este notebook no entrena: lee los resultados de las fases F5 y F6 de <code class="docutils literal notranslate"><span class="pre">src/train_t2.py</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rutas: en Colab se usa la carpeta de Drive; en el repositorio, la raíz del proyecto.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">glob</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
+
+<span class="n">DRIVE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"/content/drive/MyDrive/tarea2_series"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">DRIVE</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">BASE</span><span class="p">,</span> <span class="n">FIGS</span> <span class="o">=</span> <span class="n">DRIVE</span><span class="p">,</span> <span class="n">DRIVE</span> <span class="o">/</span> <span class="s2">"figs"</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">BASE</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+    <span class="n">FIGS</span> <span class="o">=</span> <span class="n">BASE</span> <span class="o">/</span> <span class="s2">"notebooks"</span> <span class="o">/</span> <span class="s2">"figs"</span>
+<span class="n">RESULTS</span> <span class="o">=</span> <span class="n">BASE</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"T2_RESULTS_DIR"</span><span class="p">,</span> <span class="s2">"results"</span><span class="p">)</span>
+<span class="n">FIGS</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">LAGS</span><span class="p">,</span> <span class="n">HS</span><span class="p">,</span> <span class="n">ESTRATEGIAS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">28</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">28</span><span class="p">],</span> <span class="p">[</span><span class="s2">"gk"</span><span class="p">,</span> <span class="s2">"fc"</span><span class="p">,</span> <span class="s2">"kf"</span><span class="p">]</span>
+<span class="n">NOMBRE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"gk"</span><span class="p">:</span> <span class="s2">"Group K-Fold"</span><span class="p">,</span> <span class="s2">"fc"</span><span class="p">:</span> <span class="s2">"Forward Chaining"</span><span class="p">,</span> <span class="s2">"kf"</span><span class="p">:</span> <span class="s2">"K-Fold"</span><span class="p">}</span>
+<span class="n">COL</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#2a78d6"</span><span class="p">,</span> <span class="s2">"#eb6834"</span><span class="p">,</span> <span class="s2">"#1baf7a"</span><span class="p">,</span> <span class="s2">"#eda100"</span><span class="p">]</span>          <span class="c1"># orden categorico fijo</span>
+<span class="n">COL_EST</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ESTRATEGIAS</span><span class="p">,</span> <span class="n">COL</span><span class="p">))</span>
+<span class="n">COL_LAG</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">LAGS</span><span class="p">,</span> <span class="n">COL</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"figure.dpi"</span><span class="p">:</span> <span class="mi">110</span><span class="p">,</span> <span class="s2">"axes.spines.top"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"axes.spines.right"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                     <span class="s2">"axes.grid"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"grid.alpha"</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s2">"grid.linewidth"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                     <span class="s2">"axes.prop_cycle"</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">COL</span><span class="p">),</span> <span class="s2">"lines.linewidth"</span><span class="p">:</span> <span class="mf">1.6</span><span class="p">,</span>
+                     <span class="s2">"legend.frameon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"axes.titlesize"</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">"axes.labelsize"</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">BASE</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"btc_1d.csv"</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">"date"</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"close"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">DATES</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">N_HOLD</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.10</span><span class="p">),</span> <span class="mi">56</span><span class="p">)</span>
+<span class="n">N_CV</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">N_HOLD</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">nombre</span><span class="p">):</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">FIGS</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nombre</span><span class="si">}</span><span class="s2">.png"</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">"tight"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cargar_registros</span><span class="p">():</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"raw"</span> <span class="o">/</span> <span class="s2">"*.jsonl"</span><span class="p">))):</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">);</span> <span class="n">R</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">r</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+<span class="n">REG</span> <span class="o">=</span> <span class="n">cargar_registros</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">REG</span><span class="p">)</span><span class="si">}</span><span class="s2"> registros en </span><span class="si">{</span><span class="n">RESULTS</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'raw'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">"phase"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">REG</span><span class="p">])</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>7435 registros en /content/drive/MyDrive/tarea2_series/results/raw
+search       7211
+top5           80
+eval_rep       48
+detail         48
+eval_own       32
+final_rep      16
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DET</span> <span class="o">=</span> <span class="p">{(</span><span class="n">r</span><span class="p">[</span><span class="s2">"L"</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">"H"</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">"strat"</span><span class="p">]):</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">REG</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"phase"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"detail"</span><span class="p">}</span>
+<span class="n">FIN</span> <span class="o">=</span> <span class="p">{(</span><span class="n">r</span><span class="p">[</span><span class="s2">"L"</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s2">"H"</span><span class="p">]):</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">REG</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"phase"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"top5"</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"saved"</span><span class="p">)}</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Detalle por fold: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">DET</span><span class="p">)</span><span class="si">}</span><span class="s2"> de 48 | modelos finales: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">FIN</span><span class="p">)</span><span class="si">}</span><span class="s2"> de 16"</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fila</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">bds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">MAPE</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="s2">"mape"</span><span class="p">],</span> <span class="n">MAE</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="s2">"mae"</span><span class="p">],</span> <span class="n">RMSE</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="s2">"rmse"</span><span class="p">],</span> <span class="n">MSE</span><span class="o">=</span><span class="n">m</span><span class="p">[</span><span class="s2">"mse"</span><span class="p">],</span> <span class="n">BDS_pvalue_h1</span><span class="o">=</span><span class="n">bds</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">tabla_folds</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DET</span><span class="p">[(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">)]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">Fold</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Fold </span><span class="si">{</span><span class="n">f</span><span class="p">[</span><span class="s1">'fold'</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">n_val</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"n_val"</span><span class="p">],</span> <span class="o">**</span><span class="n">fila</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"keras_val"</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s2">"bds_p_h1"</span><span class="p">]))</span>
+                      <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">"folds"</span><span class="p">]])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"Fold"</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">"n_val"</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"Mean"</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span><span class="o">.</span><span class="n">mean</span><span class="p">();</span> <span class="n">t</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"Std"</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">t</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Detalle por fold: 48 de 48 | modelos finales: 16 de 16
+</pre></div>
+</div>
+</div>
+</div>
+<section id="metricas-por-fold-validacion-usd">
+<h2>3.1 Métricas por fold (validación, USD)<a class="headerlink" href="#metricas-por-fold-validacion-usd" title="Link to this heading">#</a></h2>
+<p>Mostramos la configuración representativa (lag 14, H 14) con las tres estrategias. Las tablas de las 48 combinaciones quedan en <code class="docutils literal notranslate"><span class="pre">results/metricas_val_por_fold.csv</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">largas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DET</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">"folds"</span><span class="p">]:</span>
+        <span class="n">largas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">estrategia</span><span class="o">=</span><span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">lag</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">H</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"fold"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_train</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"n_train"</span><span class="p">],</span>
+                           <span class="n">n_val</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"n_val"</span><span class="p">],</span> <span class="o">**</span><span class="n">fila</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"keras_val"</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="s2">"bds_p_h1"</span><span class="p">]),</span>
+                           <span class="n">RMSE_mlpregressor</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"mlpreg_val"</span><span class="p">][</span><span class="s2">"rmse"</span><span class="p">],</span> <span class="n">RMSE_ingenuo</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="s2">"naive_val"</span><span class="p">][</span><span class="s2">"rmse"</span><span class="p">]))</span>
+<span class="n">LARGA</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">largas</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"estrategia"</span><span class="p">,</span> <span class="s2">"lag"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"fold"</span><span class="p">])</span>
+<span class="n">LARGA</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"metricas_val_por_fold.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ESTRATEGIAS</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="si">}</span><span class="s2"> — lag 14, H 14"</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">tabla_folds</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Group K-Fold — lag 14, H 14
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-5df562b4-10e3-4a5a-9f56-0d337137d481" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>n_val</th>
+      <th>MAPE</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>MSE</th>
+      <th>BDS_pvalue_h1</th>
+    </tr>
+    <tr>
+      <th>Fold</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fold 1</th>
+      <td>84.0</td>
+      <td>14.058</td>
+      <td>2617.873</td>
+      <td>3589.839</td>
+      <td>1.288695e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Fold 2</th>
+      <td>84.0</td>
+      <td>8.064</td>
+      <td>2099.460</td>
+      <td>3232.959</td>
+      <td>1.045203e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Fold 3</th>
+      <td>84.0</td>
+      <td>8.679</td>
+      <td>2140.165</td>
+      <td>3228.673</td>
+      <td>1.042433e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Fold 4</th>
+      <td>84.0</td>
+      <td>8.792</td>
+      <td>2652.541</td>
+      <td>4651.123</td>
+      <td>2.163294e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Fold 5</th>
+      <td>84.0</td>
+      <td>9.563</td>
+      <td>2479.151</td>
+      <td>3919.536</td>
+      <td>1.536277e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Mean</th>
+      <td>NaN</td>
+      <td>9.831</td>
+      <td>2397.838</td>
+      <td>3724.426</td>
+      <td>1.415180e+07</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Std</th>
+      <td>NaN</td>
+      <td>2.422</td>
+      <td>262.357</td>
+      <td>592.085</td>
+      <td>4.653390e+06</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-5df562b4-10e3-4a5a-9f56-0d337137d481')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-5df562b4-10e3-4a5a-9f56-0d337137d481 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-5df562b4-10e3-4a5a-9f56-0d337137d481');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Forward Chaining — lag 14, H 14
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-af34d4e0-b86a-4880-9300-b5e8d979b760" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>n_val</th>
+      <th>MAPE</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>MSE</th>
+      <th>BDS_pvalue_h1</th>
+    </tr>
+    <tr>
+      <th>Fold</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fold 1</th>
+      <td>1.0</td>
+      <td>3.902</td>
+      <td>1889.573</td>
+      <td>2142.049</td>
+      <td>4.588374e+06</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 2</th>
+      <td>1.0</td>
+      <td>7.808</td>
+      <td>1595.651</td>
+      <td>1804.684</td>
+      <td>3.256885e+06</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 3</th>
+      <td>1.0</td>
+      <td>4.517</td>
+      <td>1231.405</td>
+      <td>1357.546</td>
+      <td>1.842931e+06</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 4</th>
+      <td>1.0</td>
+      <td>9.897</td>
+      <td>6346.573</td>
+      <td>8270.414</td>
+      <td>6.839974e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 5</th>
+      <td>1.0</td>
+      <td>13.926</td>
+      <td>11682.868</td>
+      <td>12575.121</td>
+      <td>1.581337e+08</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Mean</th>
+      <td>NaN</td>
+      <td>8.010</td>
+      <td>4549.214</td>
+      <td>5229.963</td>
+      <td>4.724432e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Std</th>
+      <td>NaN</td>
+      <td>4.113</td>
+      <td>4497.905</td>
+      <td>4986.458</td>
+      <td>6.811701e+07</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-af34d4e0-b86a-4880-9300-b5e8d979b760')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-af34d4e0-b86a-4880-9300-b5e8d979b760 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-af34d4e0-b86a-4880-9300-b5e8d979b760');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>K-Fold — lag 14, H 14
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-b3b3f93c-e0ca-4a96-841d-4fe71d835804" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>n_val</th>
+      <th>MAPE</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>MSE</th>
+      <th>BDS_pvalue_h1</th>
+    </tr>
+    <tr>
+      <th>Fold</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fold 1</th>
+      <td>1.0</td>
+      <td>38.137</td>
+      <td>3106.458</td>
+      <td>3357.995</td>
+      <td>1.127613e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 2</th>
+      <td>1.0</td>
+      <td>13.846</td>
+      <td>1144.343</td>
+      <td>1393.102</td>
+      <td>1.940735e+06</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 3</th>
+      <td>1.0</td>
+      <td>15.014</td>
+      <td>7141.827</td>
+      <td>7238.362</td>
+      <td>5.239389e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 4</th>
+      <td>1.0</td>
+      <td>25.802</td>
+      <td>6957.311</td>
+      <td>6984.232</td>
+      <td>4.877950e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Fold 5</th>
+      <td>1.0</td>
+      <td>19.268</td>
+      <td>16260.956</td>
+      <td>16818.654</td>
+      <td>2.828671e+08</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Mean</th>
+      <td>NaN</td>
+      <td>22.413</td>
+      <td>6922.179</td>
+      <td>7158.469</td>
+      <td>7.945148e+07</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Std</th>
+      <td>NaN</td>
+      <td>9.959</td>
+      <td>5813.892</td>
+      <td>5937.991</td>
+      <td>1.158734e+08</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-b3b3f93c-e0ca-4a96-841d-4fe71d835804')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-b3b3f93c-e0ca-4a96-841d-4fe71d835804 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-b3b3f93c-e0ca-4a96-841d-4fe71d835804');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div></div>
+</div>
+<p>Con Forward Chaining y K-Fold cada fold de <code class="docutils literal notranslate"><span class="pre">timeseries-cv</span></code> valida sobre una sola ventana, por lo que el test BDS por fold no es calculable (se reporta vacío); con Group K-Fold cada fold valida sobre decenas de ventanas.</p>
+<p>En la configuración representativa, Group K-Fold da un RMSE medio de 3724 USD (desviación entre folds 592 USD) y un MAPE de 9.8 %. Forward Chaining da 5230 USD y K-Fold 7158 USD, pero con desviaciones entre folds del mismo orden que la media (4986 y 5938 USD). Esa dispersión se explica por el diseño de <code class="docutils literal notranslate"><span class="pre">timeseries-cv</span></code>: en estas dos estrategias cada fold valida sobre una única ventana de 14 días, y el error de una sola ventana depende de lo que hizo el precio en esas dos semanas. El fold 5 de Forward Chaining, por ejemplo, valida justo antes del hold-out (inicio de 2025) y llega a 12 575 USD. Con Group K-Fold cada fold valida sobre 84 ventanas y la estimación es mucho más estable.</p>
+<p>En Group K-Fold el p-valor BDS de h = 1 es 0.000 (redondeado a tres decimales) en los cinco folds de esta configuración: los residuos no son independientes (ver notebook 4).</p>
+</section>
+<section id="metricas-por-paso-de-horizonte">
+<h2>3.2 Métricas por paso de horizonte<a class="headerlink" href="#metricas-por-paso-de-horizonte" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">H</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">HS</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">LAGS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="s2">"gk"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">:</span>
+            <span class="n">rh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">f</span><span class="p">[</span><span class="s2">"keras_val"</span><span class="p">][</span><span class="s2">"rmse_h"</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">[(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="s2">"gk"</span><span class="p">)][</span><span class="s2">"folds"</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">H</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rh</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">COL_LAG</span><span class="p">[</span><span class="n">L</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"lag </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"H = </span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">"</span><span class="p">);</span> <span class="n">axs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Paso h (días)"</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"RMSE validación (USD)"</span><span class="p">);</span> <span class="n">axs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"RMSE promedio por paso de horizonte (Group K-Fold)"</span><span class="p">);</span> <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">"eval_rmse_por_paso"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5465fa33a50c7d9c0fa5e3c542f64ad6923020343495ab46afb0c01a4a844856.png" src="../_images/5465fa33a50c7d9c0fa5e3c542f64ad6923020343495ab46afb0c01a4a844856.png" />
+</div>
+</div>
+<p>El RMSE crece con el paso del horizonte en las cuatro longitudes de H, de forma aproximadamente lineal. Con H = 28 y lag 7, por ejemplo, pasa de unos 1950 USD en h = 1 a unos 6700 USD en h = 28 (lectura de la figura). En casi todos los pasos el lag 7 tiene el menor error y el lag 28 el mayor. El crecimiento con h es el esperado para una serie cercana a una caminata aleatoria, cuya incertidumbre se acumula con el horizonte.</p>
+</section>
+<section id="tabla-consolidada-lag-horizonte">
+<h2>3.3 Tabla consolidada lag × horizonte<a class="headerlink" href="#tabla-consolidada-lag-horizonte" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONS</span> <span class="o">=</span> <span class="n">LARGA</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"estrategia"</span><span class="p">,</span> <span class="s2">"lag"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">])[[</span><span class="s2">"RMSE"</span><span class="p">,</span> <span class="s2">"MAPE"</span><span class="p">,</span> <span class="s2">"MAE"</span><span class="p">,</span> <span class="s2">"MSE"</span><span class="p">,</span> <span class="s2">"BDS_pvalue_h1"</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">CONS</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"tabla_consolidada_lag_h.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">met</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"RMSE"</span><span class="p">,</span> <span class="s2">"MAPE"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">met</span><span class="si">}</span><span class="s2"> promedio de validación — Group K-Fold"</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">CONS</span><span class="p">[</span><span class="n">CONS</span><span class="o">.</span><span class="n">estrategia</span> <span class="o">==</span> <span class="s2">"Group K-Fold"</span><span class="p">]</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">"lag"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"H"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">met</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RMSE promedio de validación — Group K-Fold
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-396dd589-23e1-4862-97e8-fd3b8e7884cd" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>H</th>
+      <th>7</th>
+      <th>14</th>
+      <th>21</th>
+      <th>28</th>
+    </tr>
+    <tr>
+      <th>lag</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>7</th>
+      <td>2728.67</td>
+      <td>3482.70</td>
+      <td>4202.19</td>
+      <td>4706.15</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>3284.70</td>
+      <td>3724.43</td>
+      <td>4552.78</td>
+      <td>4978.11</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>3286.47</td>
+      <td>4055.85</td>
+      <td>5157.07</td>
+      <td>5279.43</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>3804.46</td>
+      <td>4636.53</td>
+      <td>5422.43</td>
+      <td>5616.73</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-396dd589-23e1-4862-97e8-fd3b8e7884cd')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-396dd589-23e1-4862-97e8-fd3b8e7884cd button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-396dd589-23e1-4862-97e8-fd3b8e7884cd');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MAPE promedio de validación — Group K-Fold
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-65226d03-b672-46f8-9f2a-e9c3eec3105a" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>H</th>
+      <th>7</th>
+      <th>14</th>
+      <th>21</th>
+      <th>28</th>
+    </tr>
+    <tr>
+      <th>lag</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>7</th>
+      <td>7.71</td>
+      <td>8.29</td>
+      <td>9.86</td>
+      <td>14.34</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>7.65</td>
+      <td>9.83</td>
+      <td>11.70</td>
+      <td>13.07</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>8.67</td>
+      <td>9.93</td>
+      <td>11.83</td>
+      <td>12.72</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>10.10</td>
+      <td>13.39</td>
+      <td>12.27</td>
+      <td>13.20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-65226d03-b672-46f8-9f2a-e9c3eec3105a')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-65226d03-b672-46f8-9f2a-e9c3eec3105a button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-65226d03-b672-46f8-9f2a-e9c3eec3105a');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div></div>
+</div>
+<p>Con Group K-Fold el RMSE medio de validación va de 2729 USD (lag 7, H 7) a 5617 USD (lag 28, H 28), y el MAPE de 7.7 % a 14.3 %. Para cada horizonte, el lag 7 es el mejor en RMSE (2729, 3483, 4202 y 4706 USD para H = 7, 14, 21 y 28), y el error crece tanto con H como con el lag. El MAPE sigue la misma tendencia, con algunas excepciones menores (por ejemplo, con H = 7 el lag 14 tiene un MAPE apenas inferior al del lag 7: 7.65 % frente a 7.71 %).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">ESTRATEGIAS</span><span class="p">):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">CONS</span><span class="p">[</span><span class="n">CONS</span><span class="o">.</span><span class="n">estrategia</span> <span class="o">==</span> <span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">LAGS</span><span class="p">:</span>
+        <span class="n">gl</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">lag</span> <span class="o">==</span> <span class="n">L</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"H"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">gl</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">gl</span><span class="o">.</span><span class="n">RMSE</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">COL_LAG</span><span class="p">[</span><span class="n">L</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"lag </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">]);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">HS</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Horizonte H (días)"</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"RMSE validación (USD)"</span><span class="p">);</span> <span class="n">axs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Degradación del error con el horizonte"</span><span class="p">);</span> <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">"eval_rmse_vs_H"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c06745b02f716190e2af9620d58d205322029d8ce151a952fa121e612cc84872.png" src="../_images/c06745b02f716190e2af9620d58d205322029d8ce151a952fa121e612cc84872.png" />
+</div>
+</div>
+</section>
+<section id="comparacion-de-estrategias-de-validacion">
+<h2>3.4 Comparación de estrategias de validación<a class="headerlink" href="#comparacion-de-estrategias-de-validacion" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="o">=</span> <span class="n">CONS</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"estrategia"</span><span class="p">:</span> <span class="s2">"estrategia"</span><span class="p">})[[</span><span class="s2">"estrategia"</span><span class="p">,</span> <span class="s2">"lag"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"RMSE"</span><span class="p">,</span> <span class="s2">"MAPE"</span><span class="p">,</span> <span class="s2">"MAE"</span><span class="p">,</span> <span class="s2">"MSE"</span><span class="p">,</span> <span class="s2">"BDS_pvalue_h1"</span><span class="p">]]</span>
+<span class="n">COMP</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"comparacion_estrategias.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">COMP</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">"lag"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"estrategia"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"RMSE"</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+  <div id="df-9604efef-6e77-41cb-a7b4-919dee0a4212" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>estrategia</th>
+      <th>Forward Chaining</th>
+      <th>Group K-Fold</th>
+      <th>K-Fold</th>
+    </tr>
+    <tr>
+      <th>lag</th>
+      <th>H</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="4" valign="top">7</th>
+      <th>7</th>
+      <td>3937.8</td>
+      <td>2728.7</td>
+      <td>3246.7</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>4339.0</td>
+      <td>3482.7</td>
+      <td>3701.1</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>6263.4</td>
+      <td>4202.2</td>
+      <td>5491.1</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>7007.2</td>
+      <td>4706.2</td>
+      <td>5008.0</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">14</th>
+      <th>7</th>
+      <td>4378.0</td>
+      <td>3284.7</td>
+      <td>3997.8</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>5230.0</td>
+      <td>3724.4</td>
+      <td>7158.5</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>5446.7</td>
+      <td>4552.8</td>
+      <td>6166.4</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>10462.3</td>
+      <td>4978.1</td>
+      <td>9956.8</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">21</th>
+      <th>7</th>
+      <td>3890.6</td>
+      <td>3286.5</td>
+      <td>3624.9</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>5453.0</td>
+      <td>4055.9</td>
+      <td>6644.8</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>10001.8</td>
+      <td>5157.1</td>
+      <td>8098.1</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>10846.3</td>
+      <td>5279.4</td>
+      <td>11852.8</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">28</th>
+      <th>7</th>
+      <td>2866.4</td>
+      <td>3804.5</td>
+      <td>4723.8</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>6487.0</td>
+      <td>4636.5</td>
+      <td>6056.0</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>7374.0</td>
+      <td>5422.4</td>
+      <td>5585.9</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>4906.2</td>
+      <td>5616.7</td>
+      <td>7503.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-9604efef-6e77-41cb-a7b4-919dee0a4212')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-9604efef-6e77-41cb-a7b4-919dee0a4212 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-9604efef-6e77-41cb-a7b4-919dee0a4212');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">))</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">0.26</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ESTRATEGIAS</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s2">"keras_val"</span><span class="p">][</span><span class="s2">"rmse"</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">[(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="n">s</span><span class="p">)][</span><span class="s2">"folds"</span><span class="p">]]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">w</span> <span class="o">-</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">COL_EST</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="sa">f</span><span class="s2">"Fold </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"RMSE validación (USD)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"RMSE por fold y estrategia (lag 14, H 14)"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">"eval_rmse_por_fold_estrategias"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/081354d7bfa3170d7367ae03060c044a11530362d93614cc4a8ba6d1d66a7000.png" src="../_images/081354d7bfa3170d7367ae03060c044a11530362d93614cc4a8ba6d1d66a7000.png" />
+</div>
+</div>
+<p>Group K-Fold da el menor RMSE en 14 de las 16 configuraciones; las excepciones son lag 28 con H 7 y lag 28 con H 28, donde gana Forward Chaining. Esta ventaja no significa que Group K-Fold sea la estrategia más fiel. Al intercalar bloques de entrenamiento y validación a lo largo de toda la serie, el modelo entrena con datos posteriores a cada bloque de validación y con bloques vecinos de nivel de precio similar, lo que hace su estimación optimista. Forward Chaining es la única que respeta el orden temporal (entrena siempre con el pasado), pero con <code class="docutils literal notranslate"><span class="pre">timeseries-cv</span></code> valida sobre una ventana por fold y su estimación es muy variable. K-Fold combina los dos problemas: entrena con datos futuros y valida sobre una ventana.</p>
+<p>En consecuencia, usamos Group K-Fold para comparar arquitecturas entre sí, donde su sesgo afecta a todas por igual, pero no como estimación del error futuro. Para eso reservamos el hold-out.</p>
+<section id="esquema-de-particion-de-cada-estrategia">
+<h3>Esquema de partición de cada estrategia<a class="headerlink" href="#esquema-de-particion-de-cada-estrategia" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">esquema</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="mi">14</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">ESTRATEGIAS</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"preds"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"detail_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">_H</span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">)</span>
+        <span class="n">nf</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">files</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_va_start"</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nf</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">parte</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">lw</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"tr"</span><span class="p">,</span> <span class="n">COL</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="s2">"va"</span><span class="p">,</span> <span class="n">COL</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">9</span><span class="p">)):</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="sa">f</span><span class="s2">"f</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parte</span><span class="si">}</span><span class="s2">_start"</span><span class="p">];</span> <span class="n">st</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="n">st</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">L</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">DATES</span><span class="p">[</span><span class="n">st</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">st</span><span class="p">),</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"|"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">lw</span> <span class="o">*</span> <span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">DATES</span><span class="p">[</span><span class="n">N_CV</span><span class="p">],</span> <span class="n">DATES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.85"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nf</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Fold"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">NOMBRE</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.lines</span><span class="w"> </span><span class="kn">import</span> <span class="n">Line2D</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">Line2D</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="n">COL</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span> <span class="n">Line2D</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="n">COL</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+                   <span class="n">Line2D</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.75"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">6</span><span class="p">)],</span> <span class="p">[</span><span class="s2">"Train (inicio del objetivo)"</span><span class="p">,</span> <span class="s2">"Validación"</span><span class="p">,</span> <span class="s2">"Hold-out"</span><span class="p">],</span>
+                  <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.45</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"esquema_particiones_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">_H</span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">esquema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/91d2c08543e0331f7e4228718c3e2d42d0769d3a20bb76e4d19b5791931aef11.png" src="../_images/91d2c08543e0331f7e4228718c3e2d42d0769d3a20bb76e4d19b5791931aef11.png" />
+</div>
+</div>
+<p>El esquema muestra las tres particiones en la configuración (14, 14). En Group K-Fold los bloques de validación (naranja) se reparten a lo largo de 2018–2025 entre bloques de entrenamiento. En Forward Chaining el entrenamiento crece hacia adelante y la validación es una sola ventana inmediatamente posterior. En K-Fold la ventana de validación tiene entrenamiento antes y después. En ningún caso el hold-out (gris) participa.</p>
+</section>
+</section>
+<section id="referencias-mlpregressor-y-pronostico-ingenuo">
+<h2>3.5 Referencias: MLPRegressor y pronóstico ingenuo<a class="headerlink" href="#referencias-mlpregressor-y-pronostico-ingenuo" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BASEL</span> <span class="o">=</span> <span class="n">LARGA</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"estrategia"</span><span class="p">,</span> <span class="s2">"lag"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">])[[</span><span class="s2">"RMSE"</span><span class="p">,</span> <span class="s2">"RMSE_mlpregressor"</span><span class="p">,</span> <span class="s2">"RMSE_ingenuo"</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">BASEL</span><span class="p">[</span><span class="s2">"MLP_mejor_que_ingenuo"</span><span class="p">]</span> <span class="o">=</span> <span class="n">BASEL</span><span class="o">.</span><span class="n">RMSE</span> <span class="o">&lt;</span> <span class="n">BASEL</span><span class="o">.</span><span class="n">RMSE_ingenuo</span>
+<span class="n">BASEL</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"baselines_val.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Configuraciones donde el MLP Keras supera al ingenuo:"</span><span class="p">,</span>
+      <span class="n">BASEL</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"estrategia"</span><span class="p">)</span><span class="o">.</span><span class="n">MLP_mejor_que_ingenuo</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s2">"sum"</span><span class="p">,</span> <span class="s2">"size"</span><span class="p">])</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+<span class="n">BASEL</span><span class="p">[</span><span class="n">BASEL</span><span class="o">.</span><span class="n">estrategia</span> <span class="o">==</span> <span class="s2">"Group K-Fold"</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Configuraciones donde el MLP Keras supera al ingenuo:                   sum  size
+estrategia                 
+Forward Chaining    0    16
+Group K-Fold        0    16
+K-Fold              0    16
+</pre></div>
+</div>
+<div class="output text_html">
+  <div id="df-cc473d94-64a7-4ab4-a3bb-a147fa980f40" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>estrategia</th>
+      <th>lag</th>
+      <th>H</th>
+      <th>RMSE</th>
+      <th>RMSE_mlpregressor</th>
+      <th>RMSE_ingenuo</th>
+      <th>MLP_mejor_que_ingenuo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>16</th>
+      <td>Group K-Fold</td>
+      <td>7</td>
+      <td>7</td>
+      <td>2728.7</td>
+      <td>2879.7</td>
+      <td>2091.4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Group K-Fold</td>
+      <td>7</td>
+      <td>14</td>
+      <td>3482.7</td>
+      <td>3638.1</td>
+      <td>3090.8</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>Group K-Fold</td>
+      <td>7</td>
+      <td>21</td>
+      <td>4202.2</td>
+      <td>4333.4</td>
+      <td>3869.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>Group K-Fold</td>
+      <td>7</td>
+      <td>28</td>
+      <td>4706.2</td>
+      <td>4837.0</td>
+      <td>4478.6</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Group K-Fold</td>
+      <td>14</td>
+      <td>7</td>
+      <td>3284.7</td>
+      <td>3666.2</td>
+      <td>2258.6</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Group K-Fold</td>
+      <td>14</td>
+      <td>14</td>
+      <td>3724.4</td>
+      <td>4302.4</td>
+      <td>3074.4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Group K-Fold</td>
+      <td>14</td>
+      <td>21</td>
+      <td>4552.8</td>
+      <td>4731.6</td>
+      <td>3743.4</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>Group K-Fold</td>
+      <td>14</td>
+      <td>28</td>
+      <td>4978.1</td>
+      <td>5323.7</td>
+      <td>4365.6</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>Group K-Fold</td>
+      <td>21</td>
+      <td>7</td>
+      <td>3286.5</td>
+      <td>3648.6</td>
+      <td>2464.2</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Group K-Fold</td>
+      <td>21</td>
+      <td>14</td>
+      <td>4055.9</td>
+      <td>4569.1</td>
+      <td>3352.1</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Group K-Fold</td>
+      <td>21</td>
+      <td>21</td>
+      <td>5157.1</td>
+      <td>5245.7</td>
+      <td>4066.5</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Group K-Fold</td>
+      <td>21</td>
+      <td>28</td>
+      <td>5279.4</td>
+      <td>5709.6</td>
+      <td>4542.8</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>Group K-Fold</td>
+      <td>28</td>
+      <td>7</td>
+      <td>3804.5</td>
+      <td>8476.6</td>
+      <td>2125.9</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>Group K-Fold</td>
+      <td>28</td>
+      <td>14</td>
+      <td>4636.5</td>
+      <td>7093.0</td>
+      <td>2992.8</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Group K-Fold</td>
+      <td>28</td>
+      <td>21</td>
+      <td>5422.4</td>
+      <td>6255.7</td>
+      <td>3808.5</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Group K-Fold</td>
+      <td>28</td>
+      <td>28</td>
+      <td>5616.7</td>
+      <td>6610.8</td>
+      <td>4492.0</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-cc473d94-64a7-4ab4-a3bb-a147fa980f40')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-cc473d94-64a7-4ab4-a3bb-a147fa980f40 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-cc473d94-64a7-4ab4-a3bb-a147fa980f40');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div></div>
+</div>
+<p><strong>El MLP no supera al pronóstico ingenuo en ninguna de las 48 combinaciones</strong> de configuración y estrategia. Con Group K-Fold su RMSE es entre 1.05 veces (lag 7, H 28) y 1.79 veces (lag 28, H 7) el del ingenuo. La brecha es menor con lag 7 y horizontes largos, y mayor con lag 28 y horizontes cortos, que es donde el ingenuo es más difícil de superar.</p>
+<p>Frente a <code class="docutils literal notranslate"><span class="pre">MLPRegressor</span></code>, el MLP de Keras con arquitectura buscada es mejor en las 16 configuraciones con Group K-Fold, con ventajas de 2 % a 18 % en catorce de ellas y de 53 % y 123 % en lag 28 con H 14 y H 7. La búsqueda de arquitectura sí aporta frente a una red por defecto, pero ninguna de las dos redes captura algo que el último precio no contenga ya.</p>
+<p>Este resultado es el que anticipamos en el EDA: la serie se comporta como una caminata aleatoria y la mejor predicción lineal del nivel es el último valor observado. Que la red quede por encima del ingenuo indica que no aprende a reproducir con exactitud esa persistencia: tiene que aproximar la identidad sobre la última entrada a través de capas ReLU y de una estandarización global, y cualquier imprecisión se convierte en error.</p>
+</section>
+<section id="modelo-final-en-el-hold-out">
+<h2>3.6 Modelo final en el hold-out<a class="headerlink" href="#modelo-final-en-el-hold-out" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">ingenuo_holdout</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_CV</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="n">H</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]);</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">H</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">])</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">P</span> <span class="o">-</span> <span class="n">Y</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">e</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">e</span> <span class="o">/</span> <span class="n">Y</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">filas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">),</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">FIN</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="n">rmse_i</span><span class="p">,</span> <span class="n">mape_i</span> <span class="o">=</span> <span class="n">ingenuo_holdout</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+    <span class="n">filas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">lag</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">H</span><span class="p">,</span> <span class="n">arquitectura</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"arch"</span><span class="p">])),</span> <span class="n">dropout_mask</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"mask"</span><span class="p">])),</span>
+                      <span class="n">RMSE</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"holdout_rmse"</span><span class="p">],</span> <span class="n">MAPE</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"holdout_mape"</span><span class="p">],</span> <span class="n">MAE</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"holdout_mae"</span><span class="p">],</span> <span class="n">MSE</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"holdout_mse"</span><span class="p">],</span>
+                      <span class="n">RMSE_ingenuo</span><span class="o">=</span><span class="n">rmse_i</span><span class="p">,</span> <span class="n">MAPE_ingenuo</span><span class="o">=</span><span class="n">mape_i</span><span class="p">,</span> <span class="n">ventanas</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"n_holdout_windows"</span><span class="p">]))</span>
+<span class="n">HOLD</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">filas</span><span class="p">)</span>
+<span class="n">HOLD</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"holdout_modelo_final.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">HOLD</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+  <div id="df-b70261aa-b39c-44c7-9a20-de9e1d3c1878" class="colab-df-container">
+    <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lag</th>
+      <th>H</th>
+      <th>arquitectura</th>
+      <th>dropout_mask</th>
+      <th>RMSE</th>
+      <th>MAPE</th>
+      <th>MAE</th>
+      <th>MSE</th>
+      <th>RMSE_ingenuo</th>
+      <th>MAPE_ingenuo</th>
+      <th>ventanas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>7</td>
+      <td>7</td>
+      <td>(64,)</td>
+      <td>(False,)</td>
+      <td>5982.13</td>
+      <td>4.55</td>
+      <td>4634.76</td>
+      <td>3.578582e+07</td>
+      <td>3905.47</td>
+      <td>2.81</td>
+      <td>286</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>7</td>
+      <td>14</td>
+      <td>(64,)</td>
+      <td>(False,)</td>
+      <td>9614.42</td>
+      <td>7.65</td>
+      <td>7780.36</td>
+      <td>9.243704e+07</td>
+      <td>5319.27</td>
+      <td>3.86</td>
+      <td>279</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>7</td>
+      <td>21</td>
+      <td>(32,)</td>
+      <td>(False,)</td>
+      <td>9889.44</td>
+      <td>8.06</td>
+      <td>8213.25</td>
+      <td>9.780094e+07</td>
+      <td>6351.48</td>
+      <td>4.62</td>
+      <td>272</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>7</td>
+      <td>28</td>
+      <td>(256,)</td>
+      <td>(False,)</td>
+      <td>18952.75</td>
+      <td>16.16</td>
+      <td>16604.76</td>
+      <td>3.592067e+08</td>
+      <td>7354.18</td>
+      <td>5.31</td>
+      <td>265</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>14</td>
+      <td>7</td>
+      <td>(32, 64, 128)</td>
+      <td>(False, False, False)</td>
+      <td>5206.84</td>
+      <td>3.96</td>
+      <td>4032.41</td>
+      <td>2.711121e+07</td>
+      <td>3905.47</td>
+      <td>2.81</td>
+      <td>286</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>14</td>
+      <td>14</td>
+      <td>(32, 256)</td>
+      <td>(False, False)</td>
+      <td>10710.71</td>
+      <td>8.94</td>
+      <td>8938.56</td>
+      <td>1.147193e+08</td>
+      <td>5319.27</td>
+      <td>3.86</td>
+      <td>279</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>14</td>
+      <td>21</td>
+      <td>(32, 32, 128)</td>
+      <td>(False, False, False)</td>
+      <td>27554.88</td>
+      <td>23.93</td>
+      <td>25560.23</td>
+      <td>7.592712e+08</td>
+      <td>6351.48</td>
+      <td>4.62</td>
+      <td>272</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>14</td>
+      <td>28</td>
+      <td>(64, 128)</td>
+      <td>(False, False)</td>
+      <td>24596.63</td>
+      <td>22.26</td>
+      <td>22970.39</td>
+      <td>6.049940e+08</td>
+      <td>7354.18</td>
+      <td>5.31</td>
+      <td>265</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>21</td>
+      <td>7</td>
+      <td>(64, 128, 128)</td>
+      <td>(False, False, False)</td>
+      <td>8160.54</td>
+      <td>6.49</td>
+      <td>6939.30</td>
+      <td>6.659445e+07</td>
+      <td>3905.47</td>
+      <td>2.81</td>
+      <td>286</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>21</td>
+      <td>14</td>
+      <td>(32, 256)</td>
+      <td>(False, False)</td>
+      <td>6929.21</td>
+      <td>5.44</td>
+      <td>5456.76</td>
+      <td>4.801399e+07</td>
+      <td>5319.27</td>
+      <td>3.86</td>
+      <td>279</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>21</td>
+      <td>21</td>
+      <td>(32, 128, 64)</td>
+      <td>(False, False, False)</td>
+      <td>21745.67</td>
+      <td>19.93</td>
+      <td>20350.43</td>
+      <td>4.728740e+08</td>
+      <td>6351.48</td>
+      <td>4.62</td>
+      <td>272</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>21</td>
+      <td>28</td>
+      <td>(32, 128, 256)</td>
+      <td>(False, False, False)</td>
+      <td>23905.52</td>
+      <td>21.47</td>
+      <td>22014.61</td>
+      <td>5.714738e+08</td>
+      <td>7354.18</td>
+      <td>5.31</td>
+      <td>265</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>28</td>
+      <td>7</td>
+      <td>(32, 128, 256)</td>
+      <td>(False, False, False)</td>
+      <td>5260.75</td>
+      <td>3.99</td>
+      <td>4177.24</td>
+      <td>2.767547e+07</td>
+      <td>3905.47</td>
+      <td>2.81</td>
+      <td>286</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>28</td>
+      <td>14</td>
+      <td>(128, 128, 256)</td>
+      <td>(False, False, False)</td>
+      <td>6387.43</td>
+      <td>5.02</td>
+      <td>4995.34</td>
+      <td>4.079924e+07</td>
+      <td>5319.27</td>
+      <td>3.86</td>
+      <td>279</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>28</td>
+      <td>21</td>
+      <td>(128, 64, 128)</td>
+      <td>(False, False, False)</td>
+      <td>9848.12</td>
+      <td>8.11</td>
+      <td>8143.94</td>
+      <td>9.698538e+07</td>
+      <td>6351.48</td>
+      <td>4.62</td>
+      <td>272</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>28</td>
+      <td>28</td>
+      <td>(256, 256)</td>
+      <td>(False, False)</td>
+      <td>12973.27</td>
+      <td>10.65</td>
+      <td>10797.44</td>
+      <td>1.683058e+08</td>
+      <td>7354.18</td>
+      <td>5.31</td>
+      <td>265</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+    <div class="colab-df-buttons">
+      
+  <div class="colab-df-container">
+    <button class="colab-df-convert" onclick="convertToInteractive('df-b70261aa-b39c-44c7-9a20-de9e1d3c1878')"
+            title="Convert this dataframe to an interactive table."
+            style="display:none;">
+      
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+    <path d="M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z"/>
+  </svg>
+    </button>
+    
+  <style>
+    .colab-df-container {
+      display:flex;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    .colab-df-buttons div {
+      margin-bottom: 4px;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+    <script>
+      const buttonEl =
+        document.querySelector('#df-b70261aa-b39c-44c7-9a20-de9e1d3c1878 button.colab-df-convert');
+      buttonEl.style.display =
+        google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+      async function convertToInteractive(key) {
+        const element = document.querySelector('#df-b70261aa-b39c-44c7-9a20-de9e1d3c1878');
+        const dataTable =
+          await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                    [key], {});
+        if (!dataTable) return;
+
+        const docLinkHtml = 'Like what you see? Visit the ' +
+          '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+          + ' to learn more about interactive tables.';
+        element.innerHTML = '';
+        dataTable['output_type'] = 'display_data';
+        await google.colab.output.renderOutput(dataTable, element);
+        const docLink = document.createElement('div');
+        docLink.innerHTML = docLinkHtml;
+        element.appendChild(docLink);
+      }
+    </script>
+  </div>
+  
+    </div>
+  </div>
+  </div></div>
+</div>
+<p>En el hold-out el MLP también queda por encima del ingenuo en las 16 configuraciones, con razones de RMSE de 1.20 (lag 28, H 14) a 4.34 (lag 14, H 21). Los mejores resultados son lag 14 con H 7 (RMSE 5207 USD, MAPE 3.96 %) y lag 28 con H 7 (5261 USD, 3.99 %), frente a 3905 USD y 2.81 % del ingenuo. Cuatro configuraciones (lag 14 y lag 21 con H 21 y H 28) superan el 19 % de MAPE.</p>
+<p>El error del hold-out es mucho mayor que el de validación con Group K-Fold. En lag 14 con H 14, por ejemplo, pasa de 3724 a 10 711 USD. Dos hechos lo explican. Primero, el optimismo de Group K-Fold descrito en 3.4. Segundo, el hold-out contiene el máximo histórico y precios por encima de todo el tramo de entrenamiento, de modo que la red extrapola (sección 1.2). El MAPE del ingenuo en el hold-out (2.8 % a 5.3 %) es menor que el MAPE de validación del MLP con Group K-Fold (7.7 % a 14.3 %), porque 2025 es el periodo de menor volatilidad de la muestra (sección 1.4).</p>
+<p>La selección del lag por horizonte para la API se hace con el RMSE de validación de Group K-Fold y elige lag 7 en los cuatro horizontes. En el hold-out lag 7 no es el mejor en ningún horizonte: con H 28 su MAPE es 16.2 %, frente a 10.7 % de lag 28. Lo reportamos tal cual; usar el hold-out para corregir la elección invalidaría la evaluación.</p>
+</section>
+<section id="series-reales-y-predichas-train-validacion-y-hold-out">
+<h2>3.7 Series reales y predichas (train, validación y hold-out)<a class="headerlink" href="#series-reales-y-predichas-train-validacion-y-hold-out" title="Link to this heading">#</a></h2>
+<p>Para cada (lag, H) graficamos la predicción a un paso (h = 1) del mejor, el mediano y el peor fold de Group K-Fold según RMSE de validación, junto con el modelo final en el hold-out.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">serie_config</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">"gk"</span><span class="p">,</span> <span class="n">mostrar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">DET</span><span class="p">[(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">)];</span> <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"preds"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"detail_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">_H</span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">)</span>
+    <span class="n">rm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span><span class="p">[</span><span class="s2">"keras_val"</span><span class="p">][</span><span class="s2">"rmse"</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s2">"folds"</span><span class="p">]]);</span> <span class="n">orden</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">rm</span><span class="p">)</span>
+    <span class="n">elegidos</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"mejor"</span><span class="p">:</span> <span class="n">orden</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"mediano"</span><span class="p">:</span> <span class="n">orden</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">orden</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"peor"</span><span class="p">:</span> <span class="n">orden</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">RESULTS</span> <span class="o">/</span> <span class="s2">"models"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"own_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">_H</span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">_preds.npz"</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">et</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">elegidos</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">parte</span><span class="p">,</span> <span class="n">cr</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">nom</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"tr"</span><span class="p">,</span> <span class="s2">"0.55"</span><span class="p">,</span> <span class="n">COL</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"train"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"va"</span><span class="p">,</span> <span class="s2">"0.15"</span><span class="p">,</span> <span class="n">COL</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"val"</span><span class="p">)):</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="sa">f</span><span class="s2">"f</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parte</span><span class="si">}</span><span class="s2">_start"</span><span class="p">];</span> <span class="n">ok</span> <span class="o">=</span> <span class="n">st</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">=</span> <span class="n">DATES</span><span class="p">[</span><span class="n">st</span><span class="p">[</span><span class="n">ok</span><span class="p">]</span> <span class="o">+</span> <span class="n">L</span><span class="p">]</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">o</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="sa">f</span><span class="s2">"f</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parte</span><span class="si">}</span><span class="s2">_real"</span><span class="p">][</span><span class="n">ok</span><span class="p">][</span><span class="n">o</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">"."</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nom</span><span class="si">}</span><span class="s2"> actual"</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">o</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="sa">f</span><span class="s2">"f</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">parte</span><span class="si">}</span><span class="s2">_pred"</span><span class="p">][</span><span class="n">ok</span><span class="p">][</span><span class="n">o</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">"."</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cp</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nom</span><span class="si">}</span><span class="s2"> predicho"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fh</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">hz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">);</span> <span class="n">th</span> <span class="o">=</span> <span class="n">DATES</span><span class="p">[</span><span class="n">N_CV</span><span class="p">:</span><span class="n">N_CV</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">hz</span><span class="p">[</span><span class="s2">"real"</span><span class="p">])]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">hz</span><span class="p">[</span><span class="s2">"real"</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.3"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"hold-out actual"</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">hz</span><span class="p">[</span><span class="s2">"pred"</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">COL</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"hold-out predicho"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"lag </span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">, H </span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2"> — fold </span><span class="si">{</span><span class="n">et</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">), RMSE val </span><span class="si">{</span><span class="n">rm</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2"> USD"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"USD (log)"</span><span class="p">)</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">markerscale</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"lower center"</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.08</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">guardar</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"serie_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s2">_H</span><span class="si">{</span><span class="n">H</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="k">if</span> <span class="n">mostrar</span> <span class="k">else</span> <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">LAGS</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">H</span> <span class="ow">in</span> <span class="n">HS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="s2">"gk"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">DET</span><span class="p">:</span>
+            <span class="n">serie_config</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/519a89879fe09956e5b1797c1b715dd1e5caac0f143b86fb921eb61f3d6b57c9.png" src="../_images/519a89879fe09956e5b1797c1b715dd1e5caac0f143b86fb921eb61f3d6b57c9.png" />
+<img alt="../_images/0f7a88b019ac71127dae6d2460825570c5494e24e18a6f34d3f6ab58c7c452ad.png" src="../_images/0f7a88b019ac71127dae6d2460825570c5494e24e18a6f34d3f6ab58c7c452ad.png" />
+<img alt="../_images/f0ac366fc7b9218dd5717f6e92e4f843d1ef4ba1e131d74f7c6281833e178c8e.png" src="../_images/f0ac366fc7b9218dd5717f6e92e4f843d1ef4ba1e131d74f7c6281833e178c8e.png" />
+<img alt="../_images/3ac419226a608a33526dad66484667cabf1fc1beaccd4fdd7d78b4174815152e.png" src="../_images/3ac419226a608a33526dad66484667cabf1fc1beaccd4fdd7d78b4174815152e.png" />
+<img alt="../_images/7c9e4ddb1ee5d8cb0ad0d780f6080aa6cc3aba16cc16914b6e87cedeb8463f1a.png" src="../_images/7c9e4ddb1ee5d8cb0ad0d780f6080aa6cc3aba16cc16914b6e87cedeb8463f1a.png" />
+<img alt="../_images/ee07ed4ba8a5ff4ca25d47d7cb093e33d591ffea411039549397ea0ea5e5a601.png" src="../_images/ee07ed4ba8a5ff4ca25d47d7cb093e33d591ffea411039549397ea0ea5e5a601.png" />
+<img alt="../_images/421b3d191799f53ae5dcb7bde047b616f76b7fb96a444933e975e525437517f7.png" src="../_images/421b3d191799f53ae5dcb7bde047b616f76b7fb96a444933e975e525437517f7.png" />
+<img alt="../_images/128c481bfe4cfe54fffa0fe8a832273290d0e989a81eb9c65d2751ff68adde5e.png" src="../_images/128c481bfe4cfe54fffa0fe8a832273290d0e989a81eb9c65d2751ff68adde5e.png" />
+<img alt="../_images/5e3de3e85e3454b6cd4ea46fd82a6de607cadbf05e7362a1cea354a4fca1bfab.png" src="../_images/5e3de3e85e3454b6cd4ea46fd82a6de607cadbf05e7362a1cea354a4fca1bfab.png" />
+<img alt="../_images/5d7739c53136bd5e7b5e58b5d475ff7ad9f7076580cc546b0f51c86a7ccad5ab.png" src="../_images/5d7739c53136bd5e7b5e58b5d475ff7ad9f7076580cc546b0f51c86a7ccad5ab.png" />
+<img alt="../_images/a95ce8e0316ab44bc16f677e243abe96921e2743004675ae278ff8294e9945c2.png" src="../_images/a95ce8e0316ab44bc16f677e243abe96921e2743004675ae278ff8294e9945c2.png" />
+<img alt="../_images/bc53eebf925e2860de71db9381e48d586a55af821f8714b293ade63b72da2db7.png" src="../_images/bc53eebf925e2860de71db9381e48d586a55af821f8714b293ade63b72da2db7.png" />
+<img alt="../_images/8e31eb0c3dd4ee55973558147d2edfbfed43915800870ddd6cc06db8ec4562eb.png" src="../_images/8e31eb0c3dd4ee55973558147d2edfbfed43915800870ddd6cc06db8ec4562eb.png" />
+<img alt="../_images/940e894f2cc760e18124aa98ea900701b3d00893bc0d73cc0c228dce4e455128.png" src="../_images/940e894f2cc760e18124aa98ea900701b3d00893bc0d73cc0c228dce4e455128.png" />
+<img alt="../_images/49767dcaed0a28c20c834414a05eece8ced910c5080eb89c4c8c0f765ed2ce07.png" src="../_images/49767dcaed0a28c20c834414a05eece8ced910c5080eb89c4c8c0f765ed2ce07.png" />
+<img alt="../_images/04bfecc452131ba83d08e232bf437dbba3e2b7d9f5dcc8f5ebedd46eedae232c.png" src="../_images/04bfecc452131ba83d08e232bf437dbba3e2b7d9f5dcc8f5ebedd46eedae232c.png" />
+</div>
+</div>
+<p>En los tramos de entrenamiento y validación las predicciones a un paso siguen de cerca al precio real en escala logarítmica, en todos los folds, también en el peor. En el hold-out el modelo final reproduce la forma de la serie con un desplazamiento: en lag 28 con H 28, por ejemplo, la predicción queda por encima del precio real durante casi todo el tramo. Ese sesgo sistemático, y no la forma de la curva, es lo que explica la mayor parte del error en el hold-out; el notebook 4 lo cuantifica.</p>
+</section>
+<section id="sintesis">
+<h2>3.8 Síntesis<a class="headerlink" href="#sintesis" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>El MLP no supera al pronóstico ingenuo en ninguna configuración, ni en validación (48 de 48) ni en el hold-out (16 de 16). Sí supera a <code class="docutils literal notranslate"><span class="pre">MLPRegressor</span></code> en las 16 configuraciones con Group K-Fold.</p></li>
+<li><p>El error crece con el horizonte y con el lag; lag 7 es el mejor en validación, pero no en el hold-out.</p></li>
+<li><p>Group K-Fold produce la estimación más baja y estable, y también la más optimista. Forward Chaining y K-Fold, tal como los implementa <code class="docutils literal notranslate"><span class="pre">timeseries-cv</span></code>, validan una ventana por fold y su estimación es muy variable.</p></li>
+<li><p>En el hold-out el error está dominado por un desplazamiento sistemático de la predicción, asociado a precios fuera del rango de entrenamiento.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="2_architecture_search.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">2. Búsqueda de la mejor arquitectura MLP</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="4_residual_analysis.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">4. Diagnóstico de residuos</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenido
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-por-fold-validacion-usd">3.1 Métricas por fold (validación, USD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metricas-por-paso-de-horizonte">3.2 Métricas por paso de horizonte</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tabla-consolidada-lag-horizonte">3.3 Tabla consolidada lag × horizonte</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-de-estrategias-de-validacion">3.4 Comparación de estrategias de validación</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#esquema-de-particion-de-cada-estrategia">Esquema de partición de cada estrategia</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#referencias-mlpregressor-y-pronostico-ingenuo">3.5 Referencias: MLPRegressor y pronóstico ingenuo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modelo-final-en-el-hold-out">3.6 Modelo final en el hold-out</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#series-reales-y-predichas-train-validacion-y-hold-out">3.7 Series reales y predichas (train, validación y hold-out)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sintesis">3.8 Síntesis</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Por Anyely Sanjuan Benavides y Juan David Díaz Fernández
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

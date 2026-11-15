@@ -1,0 +1,7 @@
+.autores { display: flex; flex-direction: column; gap: 1.2rem; align-items: center;
+           padding: 1rem 0 1.2rem; border-bottom: 1px solid var(--pst-color-border); margin-bottom: 1rem; }
+.autor { text-align: center; }
+.autor img { width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+             border: 2px solid var(--pst-color-border); }
+.autor-nombre { margin: 0.5rem 0 0.1rem; font-weight: 600; color: var(--pst-color-text-base); }
+.autor-detalle { margin: 0; font-size: 0.85rem; color: var(--pst-color-text-muted); line-height: 1.3; }
