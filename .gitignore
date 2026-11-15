@@ -1,0 +1,19 @@
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+# Jupyter Book
+_build/
+# Resultados crudos del entrenamiento (quedan en Google Drive; en el repositorio van las tablas CSV)
+results/raw/
+results/preds/
+results/errors/
+results/models/
+results/*.log
+results/T0.txt
+results_smoke/
+cache/
+*.tmp
+*.tmp.npz

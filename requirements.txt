@@ -1,0 +1,8 @@
+# API de inferencia (también la usa el Dockerfile)
+fastapi>=0.110
+uvicorn>=0.27
+pydantic>=2.5
+numpy>=1.26
+scikit-learn>=1.4
+joblib>=1.3
+tensorflow==2.21.0

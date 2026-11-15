@@ -1,0 +1,9 @@
+format: jb-book
+root: book/intro
+chapters:
+  - file: book/diseno
+  - file: notebooks/1_eda
+  - file: notebooks/2_architecture_search
+  - file: notebooks/3_model_training
+  - file: notebooks/4_residual_analysis
+  - file: book/conclusiones
