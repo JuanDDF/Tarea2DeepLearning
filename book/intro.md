@@ -4,11 +4,12 @@
 
 Anyely Sanjuan Benavides y Juan David Díaz Fernández · Profesor: Dr. Lihki Rubio
 
-```{figure} ../notebooks/figs/eda_precio.png
-:name: fig-precio
-:width: 100%
+```{figure} images/criptomonedas.jpg
+:name: fig-criptomonedas
+:width: 80%
+:alt: Monedas físicas de Ethereum, Ripple y Bitcoin sobre fondo oscuro
 
-Precio de cierre diario de BTCUSDT en Binance (2018–2025). La franja gris es el hold-out temporal, que no participa en la validación cruzada, en la búsqueda de arquitectura ni en el ajuste de los escaladores.
+Monedas conmemorativas de Ethereum, Ripple y Bitcoin. Imagen tomada del blog de Economía y Empresa de la Universitat Oberta de Catalunya (2021), [fuente](https://blogs.uoc.edu/economia-empresa/wp-content/uploads/sites/152/2021/11/criptomonedes.jpeg).
 ```
 
 ## Descripción del proyecto
